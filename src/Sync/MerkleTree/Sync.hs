@@ -18,7 +18,6 @@ import Control.Concurrent(newChan)
 import Control.Concurrent.MVar
 import Control.Monad
 import Control.Monad.State
-import Data.Monoid
 import System.FilePath
 import Prelude hiding (lookup)
 import Sync.MerkleTree.Trie hiding (tests)
@@ -59,21 +58,6 @@ mkChanStreams :: IO (InputStream ByteString, OutputStream ByteString)
 mkChanStreams =
     do chan <- newChan
        liftM2 (,) (ST.chanToInput chan) (ST.chanToOutput chan)
-
-instance Protocol RequestMonad where
-    queryHashReq = request . QueryHash
-    querySetReq = request . QuerySet
-    queryFileReq = request . QueryFile
-    queryFileContReq = request . QueryFileCont
-    logReq = request . Log
-    queryTime = request QueryTime
-    terminateReq = request . Terminate
-
-instance ClientMonad RequestMonad where
-    split = splitRequests
-
-instance ClientMonad ServerMonad where
-    split xs = liftM mconcat $ sequence xs
 
 data Direction
     = FromRemote

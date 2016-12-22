@@ -41,6 +41,8 @@ import Data.IORef(IORef,newIORef,modifyIORef,readIORef)
 import Data.Monoid(Monoid, mempty, mappend)
 import System.IO.Streams(InputStream, OutputStream)
 import Sync.MerkleTree.Util.GetFromInputStream
+import Sync.MerkleTree.Client
+import Sync.MerkleTree.CommTypes
 import qualified Data.Bytes.Serial as SE
 import qualified Data.Bytes.Put as P
 import qualified System.IO.Streams as ST
@@ -52,6 +54,18 @@ data LiftIOState b = forall a. LiftIOState (IO a) (a -> RequestMonadT ByteString
 
 newtype RequestMonad b = RequestMonad { unReqMonad :: RequestMonadT ByteString b }
     deriving (Monad, Functor, Applicative, MonadIO)
+
+instance Protocol RequestMonad where
+    queryHashReq = request . QueryHash
+    querySetReq = request . QuerySet
+    queryFileReq = request . QueryFile
+    queryFileContReq = request . QueryFileCont
+    logReq = request . Log
+    queryTime = request QueryTime
+    terminateReq = request . Terminate
+
+instance ClientMonad RequestMonad where
+    split = splitRequests
 
 data RequestMonadT f b
     = Split (SplitState f b)

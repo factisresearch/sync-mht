@@ -7,6 +7,7 @@ module Sync.MerkleTree.Server where
 
 import Codec.Compression.GZip
 import Control.Monad.State
+import Sync.MerkleTree.Client
 import Sync.MerkleTree.CommTypes
 import Sync.MerkleTree.Trie
 import qualified Data.Text as T
@@ -28,6 +29,9 @@ data ServerState
     }
 
 type ServerMonad = StateT ServerState IO
+
+instance ClientMonad ServerMonad where
+    split xs = liftM mconcat $ sequence xs
 
 startServerState :: FilePath -> Trie Entry -> IO ServerState
 startServerState fp trie =

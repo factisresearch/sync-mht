@@ -3,7 +3,6 @@
 module Sync.MerkleTree.Run where
 
 import Control.Concurrent
-import Control.Concurrent.MVar
 import Control.Monad
 import Data.List
 import System.Console.GetOpt
@@ -212,7 +211,7 @@ runParent clientServerOpts mRemoteCmd source destination dir =
                     let shutdown =
                             do hClose hIn
                                hClose hOut
-                               waitForProcess ph
+                               void $ waitForProcess ph
                                return ()
                     return (shutdown, parentStreams)
              Simulate ->
