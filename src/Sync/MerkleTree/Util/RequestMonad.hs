@@ -35,6 +35,7 @@ module Sync.MerkleTree.Util.RequestMonad
 import Control.Applicative(Applicative(..))
 import Control.Concurrent(Chan, writeChan, readChan, newChan, forkIO)
 import Control.Monad(ap,liftM,unless)
+import qualified Control.Monad.Fail
 import Control.Monad.IO.Class(MonadIO(..))
 import Data.ByteString(ByteString)
 import Data.IORef(IORef,newIORef,modifyIORef,readIORef)
@@ -53,7 +54,7 @@ data RequestState f b = forall a. (SE.Serial a) => RequestState f (a -> RequestM
 data LiftIOState b = forall a. LiftIOState (IO a) (a -> RequestMonadT ByteString b)
 
 newtype RequestMonad b = RequestMonad { unReqMonad :: RequestMonadT ByteString b }
-    deriving (Monad, Functor, Applicative, MonadIO)
+    deriving (Monad, Functor, Applicative, MonadIO, Control.Monad.Fail.MonadFail)
 
 instance Protocol RequestMonad where
     queryHashReq = request . QueryHash
@@ -85,6 +86,9 @@ instance Monad (RequestMonadT ByteString) where
     return = Return
     fail = Fail
     (>>=) = bindImpl
+
+instance Control.Monad.Fail.MonadFail (RequestMonadT ByteString) where
+    fail = Fail
 
 instance MonadIO (RequestMonadT ByteString) where
     liftIO x =  LiftIO $ LiftIOState x Return

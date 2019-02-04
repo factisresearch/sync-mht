@@ -9,11 +9,12 @@ import qualified Data.Text as T
 import Data.Bytes.Serial
 import Data.Time.Clock
 import Data.ByteString(ByteString)
+import Control.Monad.Fail (MonadFail)
 
 import Sync.MerkleTree.Types
 import Sync.MerkleTree.Trie
 
-class Monad m => Protocol m where
+class MonadFail m => Protocol m where
     queryHashReq :: TrieLocation -> m Fingerprint
     querySetReq :: TrieLocation -> m (Set Entry)
     logReq :: T.Text -> m Bool
