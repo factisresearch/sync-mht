@@ -54,8 +54,7 @@ If you want to contribute - cloning the latest commit and building can be done u
 following steps:
 
 ```
-git clone --recursive https://github.com/ekarayel/sync-mht.git
+git clone https://github.com/ekarayel/sync-mht.git
 cd sync-mht
-stack exec runhaskell configure.hs
 stack install
 ```
